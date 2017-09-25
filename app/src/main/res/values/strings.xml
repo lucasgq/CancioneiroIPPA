@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CancioneiroIPPA</string>
+    <string name="app_name">Cancioneiro IPPA</string>
     <string name="title_activity_lyrics">LyricsActivity</string>
     <string name="title_activity_create_song">CreateSong</string>
 
@@ -78,4 +78,13 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="action_favorite">Lista de Favoritos</string>
+    <string name="action_settings">Tamanho da Fonte</string>
+    <string name="settings_title">Configurações</string>
+    <string name="ok_button">Fechar</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_home">Tela Inicial</string>
+    <string name="list_number_text">Por Número:</string>
+    <string name="list_title_text">Por Título:</string>
+    <string name="list_lyrics_text">Por Letra:</string>
 </resources>

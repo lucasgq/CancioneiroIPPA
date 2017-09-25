@@ -6,12 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import br.com.ippontadareia.cancioneiroippa.R;
+import br.com.ippontadareia.cancioneiroippa.dao.TamanhoFonteDAO;
+import br.com.ippontadareia.cancioneiroippa.helper.Constants;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
+import br.com.ippontadareia.cancioneiroippa.modelo.TamanhoFonte;
 
 /**
  * Created by lucasgasparquaresma on 3/9/17.
@@ -21,8 +25,6 @@ public class SongsAdapter extends BaseAdapter {
 
     private final List<Cantico> canticos;
     private final Context context;
-    private final Integer lyricsMaxLength = 50;
-    private final String chorus = "[Coro]";
 
     public SongsAdapter(List<Cantico> canticos, Context context) {
         this.canticos = canticos;
@@ -58,28 +60,34 @@ public class SongsAdapter extends BaseAdapter {
 
         TextView titleField = (TextView) view.findViewById(R.id.item_title);
         TextView firstLineField = (TextView) view.findViewById(R.id.item_first_line);
-        ImageButton favoriteField = (ImageButton) view.findViewById(R.id.item_favorite);
+        ImageView favoriteField = (ImageView) view.findViewById(R.id.item_favorite);
+
+        TamanhoFonteDAO fontDAO = new TamanhoFonteDAO(context);
+        TamanhoFonte sizes = fontDAO.selectSizes();
 
         titleField.setText(cantico.getNumber() + " - " + cantico.getTitle());
+        titleField.setTextSize(sizes.getListTitleSize());
+
         if(firstLineField != null){
             String[] lyric = cantico.getLyrics().split("\n");
             String firstLine = lyric[0];
 
-            if(chorus.equals(firstLine)){
+            if(Constants.CHORUS.equals(firstLine)){
                 firstLine = lyric[1];
             }
 
-            if(firstLine.length() > lyricsMaxLength){
-                firstLine = String.valueOf(firstLine.subSequence(0, lyricsMaxLength));
+            if(firstLine.length() > Constants.LYRICSMAXLENGHT){
+                firstLine = String.valueOf(firstLine.subSequence(0, Constants.LYRICSMAXLENGHT));
                 firstLine = firstLine + "...";
             }
             firstLineField.setText(firstLine);
+            firstLineField.setTextSize(sizes.getListLyricSize());
         }
         if(favoriteField != null){
             if(cantico.isFavorite()){
-                favoriteField.setImageResource(R.drawable.favorite_on);
+                favoriteField.setImageResource(R.drawable.shorter_favorite_on);
             } else {
-                favoriteField.setImageResource(R.drawable.favorite_off);
+                favoriteField.setImageResource(R.drawable.shorter_favorite_off);
             }
         }
 

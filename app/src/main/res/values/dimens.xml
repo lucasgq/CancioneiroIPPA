@@ -7,6 +7,7 @@
     <dimen name="min_margin">5dp</dimen>
     <dimen name="song_title">30dp</dimen>
     <dimen name="song_lyrics">24dp</dimen>
+    <dimen name="search_spinner">18sp</dimen>
     <dimen name="space_dimension">26dp</dimen>
     <dimen name="larger_space_dimension">32dp</dimen>
     <dimen name="activity_horizontal_larger_margin">20dp</dimen>

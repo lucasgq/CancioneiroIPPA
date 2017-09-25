@@ -32,7 +32,7 @@ public class SongList {
                 "Deus, Tu és meu Deus", "Salmo 142", "Salmo 146", "Salmo 121", "Salmo 145", "Salmo 18", "Salmo 8", "Salmo 3 (Amazing Grace)", "Salmo 11", "Fale Ó Deus");
 
         listLyrics = Arrays.asList("Tua, Senhor, é a grandeza e o poder\n" +
-                        "A honra, a vitória e a majestade\n" +
+                "A honra, a vitória e a majestade\n" +
                         "Porque Teu é tudo quanto há nos céus e na terra\n" +
                         "Teu, Senhor, é o reino, e Tu te exaltaste\n" +
                         "Por chefe sobre todos\n" +

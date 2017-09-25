@@ -4,93 +4,108 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ippontadareia.cancioneiroippa.adapter.SongsAdapter;
 import br.com.ippontadareia.cancioneiroippa.dao.CanticoDAO;
 import br.com.ippontadareia.cancioneiroippa.dao.TamanhoFonteDAO;
 import br.com.ippontadareia.cancioneiroippa.helper.Constants;
-import br.com.ippontadareia.cancioneiroippa.helper.SongbookHelper;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
 import br.com.ippontadareia.cancioneiroippa.modelo.TamanhoFonte;
 
-public class LyricsActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity {
 
-    private SongbookHelper helper;
-    private Cantico cantico;
+    private ListView listaCanticos;
+    private List<Cantico> favoriteList;
+    SongsAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lyrics);
+        setContentView(R.layout.activity_summary);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.child_toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar favoriteToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(favoriteToolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.home);
         ab.setDisplayShowTitleEnabled(false);
 
-        helper = new SongbookHelper(this, LyricsActivity.this);
-
         Intent intent = getIntent();
-        cantico = (Cantico) intent.getSerializableExtra("cantico");
+        favoriteList = (ArrayList<Cantico>) intent.getSerializableExtra("favoriteList");
 
-        if (cantico != null) {
-            helper.fillScreen(cantico);
-        }
+        listaCanticos = (ListView) findViewById(R.id.lista_canticos);
 
-        ImageView favoriteSong = (ImageView) findViewById(R.id.cantico_favorite);
-        favoriteSong.setOnClickListener(new View.OnClickListener() {
+        listaCanticos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                setFavoriteSong();
+            public void onItemClick(AdapterView<?> lista, View item, int position, long id) {
+                Cantico cantico = (Cantico) listaCanticos.getItemAtPosition(position);
+
+                Intent intentGoToLyrics = new Intent(FavoritesActivity.this, LyricsActivity.class);
+                intentGoToLyrics.putExtra("cantico", cantico);
+                startActivity(intentGoToLyrics);
             }
         });
+        registerForContextMenu(listaCanticos);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar, menu);
+        inflater.inflate(R.menu.favorite_toolbar, menu);
 
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFavorites();
+    }
+
+    private void loadFavorites() {
+        CanticoDAO dao = new CanticoDAO(this);
+        List<Cantico> canticos = null;
+
+        canticos = dao.listFavorites();
+
+        dao.close();
+
+        if(canticos != null && canticos.size() > 0){
+            adapter = new SongsAdapter(canticos, this);
+            listaCanticos.setAdapter(adapter);
+        } else {
+            Toast.makeText(this, "Não há cânticos na lista de favoritos", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_search:
 
-                Intent intentGoToSearchPopUp = new Intent(LyricsActivity.this, SearchSongActivity.class);
+                Intent intentGoToSearchPopUp = new Intent(FavoritesActivity.this, SearchSongActivity.class);
                 startActivity(intentGoToSearchPopUp);
-
-                break;
-
-            case R.id.action_favorite:
-
-                CanticoDAO dao = new CanticoDAO(LyricsActivity.this);
-                List<Cantico> listCanticos = new ArrayList<Cantico>();
-                listCanticos = dao.listFavorites();
-                Intent intentGoToFavoriteList = new Intent(LyricsActivity.this, FavoritesActivity.class);
-                intentGoToFavoriteList.putExtra("favoriteList", (ArrayList<Cantico>) listCanticos);
-                startActivity(intentGoToFavoriteList);
 
                 break;
 
@@ -121,8 +136,7 @@ public class LyricsActivity extends AppCompatActivity {
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         fontSizeIndicator.setText(progress + Constants.MIN_FONT_SIZE + "");
                         fontDAO.changeFontsize(progress + Constants.MIN_FONT_SIZE);
-                        //TODO HOW TO UPDATE LYRICS? CREATE ADAPTER?
-                        helper.fillScreen(cantico);
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -141,27 +155,6 @@ public class LyricsActivity extends AppCompatActivity {
 
                 break;
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    public void setFavoriteSong(){
-        CanticoDAO dao = new CanticoDAO(this);
-        cantico = dao.setFavorite(cantico);
-        Intent intentGoToLyrics = new Intent(LyricsActivity.this, LyricsActivity.class);
-        intentGoToLyrics.putExtra("cantico", cantico);
-        helper.fillScreen(cantico);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadLyrics();
-    }
-
-    private void loadLyrics() {
-        CanticoDAO dao = new CanticoDAO(LyricsActivity.this);
-        cantico = dao.selectSongByNumber(cantico.getNumber());
-        helper.fillScreen(cantico);
     }
 }

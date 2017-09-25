@@ -1,57 +1,56 @@
 package br.com.ippontadareia.cancioneiroippa;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import br.com.ippontadareia.cancioneiroippa.adapter.SongsAdapter;
 import br.com.ippontadareia.cancioneiroippa.dao.CanticoDAO;
+import br.com.ippontadareia.cancioneiroippa.dao.TamanhoFonteDAO;
+import br.com.ippontadareia.cancioneiroippa.helper.Constants;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
+import br.com.ippontadareia.cancioneiroippa.modelo.TamanhoFonte;
 
 public class SummaryActivity extends AppCompatActivity {
 
     private ListView listaCanticos;
-    private List<Cantico> selectAllList;
-    private List<Cantico> favoriteList;
-    private List<Cantico> selectByTitleList;
-    private String title;
-    private List<Cantico> selectByLyricsList;
-    private String lyrics;
     private Cantico cantico;
-
-
-    private SongbookHelper helper;
+    private List<Cantico> songList;
+    SongsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setIcon(R.drawable.home);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(false);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitleMarginStart(0);
 
         Intent intent = getIntent();
-        selectAllList = (ArrayList<Cantico>) intent.getSerializableExtra("selectAllList");
-        favoriteList = (ArrayList<Cantico>) intent.getSerializableExtra("favoriteList");
-        selectByTitleList = (ArrayList<Cantico>) intent.getSerializableExtra("selectByTitleList");
-        title = intent.getStringExtra("title");
-        selectByLyricsList = (ArrayList<Cantico>) intent.getSerializableExtra("selectByLyricsList");
-        lyrics = intent.getStringExtra("lyrics");
         cantico = (Cantico) intent.getSerializableExtra("cantico");
 
         listaCanticos = (ListView) findViewById(R.id.lista_canticos);
@@ -74,8 +73,7 @@ public class SummaryActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_button, menu);
-        inflater.inflate(R.menu.favorite_list_button, menu);
+        inflater.inflate(R.menu.toolbar, menu);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -84,25 +82,12 @@ public class SummaryActivity extends AppCompatActivity {
         CanticoDAO dao = new CanticoDAO(this);
         List<Cantico> canticos = null;
 
-        if(favoriteList != null){
-            canticos = dao.listFavorites();
-        } else if(selectByTitleList != null){
-            canticos = selectByTitleList;
-        } else if (selectByLyricsList != null) {
-            canticos = selectByLyricsList;
-        } else if(selectAllList != null){
-            canticos = selectAllList;
-        } else {
-            canticos = dao.selectAll();
-        }
+        canticos = dao.selectAll();
+        songList = canticos;
 
         dao.close();
 
-        if(canticos.size() == 0){
-            Toast.makeText(this, "Não há cânticos na lista de favoritos", Toast.LENGTH_SHORT).show();
-        }
-
-        SongsAdapter adapter = new SongsAdapter(canticos, this);
+        adapter = new SongsAdapter(canticos, this);
         listaCanticos.setAdapter(adapter);
     }
 
@@ -135,30 +120,67 @@ public class SummaryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
-            case R.id.search_song:
+            case R.id.action_search:
 
-                Intent intentGoToSearchPopUp = new Intent(SummaryActivity.this, SearchPopUpActivity.class);
+                Intent intentGoToSearchPopUp = new Intent(SummaryActivity.this, SearchSongActivity.class);
                 startActivity(intentGoToSearchPopUp);
 
                 break;
 
-            case R.id.favorite_list:
+            case R.id.action_favorite:
 
                 CanticoDAO dao = new CanticoDAO(SummaryActivity.this);
                 List<Cantico> listCanticos = new ArrayList<Cantico>();
                 listCanticos = dao.listFavorites();
-                Intent intentGoToFavoriteList = new Intent(SummaryActivity.this, SummaryActivity.class);
+                Intent intentGoToFavoriteList = new Intent(SummaryActivity.this, FavoritesActivity.class);
                 intentGoToFavoriteList.putExtra("favoriteList", (ArrayList<Cantico>) listCanticos);
-                if(listCanticos.size() == 0){
-                    Toast.makeText(SummaryActivity.this, "Não há cânticos na lista de favoritos", Toast.LENGTH_SHORT).show();
-                }
                 startActivity(intentGoToFavoriteList);
 
                 break;
 
-            case R.drawable.home:
-                Intent intentGoHome = new Intent(this, SummaryActivity.class);
-                startActivity(intentGoHome);
+            case R.id.action_settings:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View view = inflater.inflate(R.layout.settings_activity, null);
+
+                builder.setView(view)
+                         .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int id) {
+                            }
+                        });
+
+                final TamanhoFonteDAO fontDAO = new TamanhoFonteDAO(this);
+
+                SeekBar fontSizeSB = (SeekBar) view.findViewById(R.id.seekbar_font_size);
+                final TextView fontSizeIndicator = (TextView) view.findViewById(R.id.font_size_selected);
+                TamanhoFonte tf = fontDAO.selectSizes();
+                fontSizeIndicator.setText(tf.getLyricSize().toString());
+
+                fontSizeSB.setProgress((int) (tf.getLyricSize() - Constants.MIN_FONT_SIZE));
+
+                fontSizeSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        fontSizeIndicator.setText(progress + Constants.MIN_FONT_SIZE + "");
+                        fontDAO.changeFontsize(progress + Constants.MIN_FONT_SIZE);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
 
                 break;
         }

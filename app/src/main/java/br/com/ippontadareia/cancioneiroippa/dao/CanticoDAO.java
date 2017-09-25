@@ -90,7 +90,7 @@ public class CanticoDAO extends SQLiteOpenHelper {
         return canticos;
     }
 
-    public Cantico selectByNumber(Long songNumber){
+    public Cantico selectSongByNumber(Long songNumber){
         Cantico cantico = new Cantico();
 
         String selectSingle = "SELECT * FROM Canticos WHERE Number = " + songNumber;
@@ -106,6 +106,22 @@ public class CanticoDAO extends SQLiteOpenHelper {
         }
 
         return cantico;
+    }
+
+    public List<Cantico> selectByNumber(Long songNumber){
+        List<Cantico> canticos = new ArrayList<Cantico>();
+
+        String[] sqlNumber = new String[1];
+        sqlNumber [0] = "%" + songNumber + "%";
+
+        String selectByNumber = "SELECT * FROM Canticos WHERE Number LIKE ? ORDER BY Number;";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery(selectByNumber, sqlNumber);
+
+        canticos = getSongList(canticos, c);
+        c.close();
+
+        return canticos;
     }
 
     public List<Cantico> selectByTitle(String title){
@@ -139,7 +155,7 @@ public class CanticoDAO extends SQLiteOpenHelper {
         db.update("Canticos", cv, "Id=" + cantico.getId(), null);
         db.close();
 
-        cantico = selectByNumber(cantico.getNumber());
+        cantico = selectSongByNumber(cantico.getNumber());
 
         return cantico;
     }
