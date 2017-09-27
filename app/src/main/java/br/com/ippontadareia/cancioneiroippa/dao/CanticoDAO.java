@@ -77,15 +77,17 @@ public class CanticoDAO extends SQLiteOpenHelper {
     public List<Cantico> selectByLyrics(String lyrics){
         List<Cantico> canticos = new ArrayList<Cantico>();
 
-        String[] sqlLyrics = new String[1];
-        sqlLyrics [0] = "%" + lyrics + "%";
+        if(!lyrics.isEmpty()){
+            String[] sqlLyrics = new String[1];
+            sqlLyrics [0] = "%" + lyrics + "%";
 
-        String selectSingle = "SELECT * FROM Canticos WHERE Lyrics LIKE ? ORDER BY Number;";
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(selectSingle, sqlLyrics);
+            String selectSingle = "SELECT * FROM Canticos WHERE Lyrics LIKE ? ORDER BY Number;";
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor c = db.rawQuery(selectSingle, sqlLyrics);
 
-        canticos = getSongList(canticos, c);
-        c.close();
+            canticos = getSongList(canticos, c);
+            c.close();
+        }
 
         return canticos;
     }
@@ -127,16 +129,17 @@ public class CanticoDAO extends SQLiteOpenHelper {
     public List<Cantico> selectByTitle(String title){
         List<Cantico> canticos = new ArrayList<Cantico>();
 
-        String[] sqlTitle = new String[1];
-        sqlTitle [0] = "%" + title + "%";
+        if(!title.isEmpty()){
+            String[] sqlTitle = new String[1];
+            sqlTitle [0] = "%" + title + "%";
 
-        String select = "SELECT * FROM Canticos WHERE Title LIKE ? ORDER BY Number;";
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(select, sqlTitle);
+            String select = "SELECT * FROM Canticos WHERE Title LIKE ? ORDER BY Number;";
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor c = db.rawQuery(select, sqlTitle);
 
-        canticos = getSongList(canticos, c);
-        c.close();
-
+            canticos = getSongList(canticos, c);
+            c.close();
+        }
 
         return canticos;
     }

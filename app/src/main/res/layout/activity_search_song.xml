@@ -28,6 +28,7 @@
             android:textColor="@color/colorDarkerGrey"/>
     </LinearLayout>
 
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,5 +52,9 @@
         android:id="@+id/lyrics_list_song_frame">
 
     </FrameLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_dimension" />
 
 </LinearLayout>

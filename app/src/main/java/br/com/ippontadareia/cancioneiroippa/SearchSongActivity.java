@@ -29,6 +29,8 @@ import br.com.ippontadareia.cancioneiroippa.helper.Constants;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
 import br.com.ippontadareia.cancioneiroippa.modelo.TamanhoFonte;
 
+import static java.security.AccessController.getContext;
+
 public class SearchSongActivity extends AppCompatActivity {
 
     private Constants constants;
@@ -61,63 +63,42 @@ public class SearchSongActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-
-                Bundle numberParams = new Bundle();
-                numberParams.putSerializable("numberList", null);
-                Bundle titleParams = new Bundle();
-                titleParams.putSerializable("titleList", null);
-                Bundle lyricsParams = new Bundle();
-                lyricsParams.putSerializable("lyrcList", null);
-
                 FragmentManager manager = getSupportFragmentManager();
 
                 String argument = searchArgument.getText().toString().trim();
-                //if(!"".equals(argument)){
-                    Cantico cantico = new Cantico();
-                    List<Cantico> numberSearchList = new ArrayList<Cantico>();
-                    List<Cantico> titleSearchList = new ArrayList<Cantico>();
-                    List<Cantico> lyricSearchList = new ArrayList<Cantico>();
 
-                    CanticoDAO dao = new CanticoDAO(SearchSongActivity.this);
+                Cantico cantico = new Cantico();
+                List<Cantico> numberSearchList = new ArrayList<Cantico>();
+                List<Cantico> titleSearchList = new ArrayList<Cantico>();
+                List<Cantico> lyricSearchList = new ArrayList<Cantico>();
 
-                    SearchResultFragment numberListFragment = new SearchResultFragment();
-                    SearchResultTitleFragment titleListFragment = new SearchResultTitleFragment();
-                    SearchResultLyricsFragment lyricsListFragment = new SearchResultLyricsFragment();
+                CanticoDAO dao = new CanticoDAO(SearchSongActivity.this);
+                String argumentToNumber = searchArgument.getText().toString().trim();
 
-                    String argumentToNumber = searchArgument.getText().toString().trim();
+                FragmentTransaction tx = manager.beginTransaction();
 
-                    if(isNumeric(argumentToNumber)){
-                        Long number = Long.valueOf(argumentToNumber);
-                        numberSearchList = dao.selectByNumber(number);
-                        //Bundle numberParams = new Bundle();
-                        //if(numberSearchList.size() > 0){
-                            numberParams.putSerializable("numberList", (ArrayList<Cantico>)numberSearchList);
-                            numberListFragment.setArguments(numberParams);
-                            doNumberFragmentTransaction(manager, numberListFragment);
-                        //}
-                    }
+                if(isNumeric(argumentToNumber)){
+                    Long number = Long.valueOf(argumentToNumber);
+                    numberSearchList = dao.selectByNumber(number);
+                }
+                doNumberFragmentTransaction(tx, numberSearchList);
 
-                    //select by title
-                    cantico.setTitle(argument);
-                    titleSearchList = dao.selectByTitle(cantico.getTitle());
-                    //select by lyrics
-                    cantico.setLyrics(argument);
-                    lyricSearchList = dao.selectByLyrics(cantico.getLyrics());
+                cantico.setTitle(argument);
+                titleSearchList = dao.selectByTitle(cantico.getTitle());
 
-                    //if(titleSearchList.size() > 0){
-                        titleParams.putSerializable("titleList", (ArrayList<Cantico>)titleSearchList);
-                        titleListFragment.setArguments(titleParams);
-                        doTitleFragmentTransaction(manager, titleListFragment);
-                    //}
+                cantico.setLyrics(argument);
+                lyricSearchList = dao.selectByLyrics(cantico.getLyrics());
 
-                    //if(lyricSearchList.size() > 0){
-                        lyricsParams.putSerializable("lyrcList", (ArrayList<Cantico>)lyricSearchList);
-                        lyricsListFragment.setArguments(lyricsParams);
-                        doLyricsFragmentTransaction(manager, lyricsListFragment);
-                    //}
-                    //listFragment.setArguments(params);
-                //}
+                doTitleFragmentTransaction(tx, titleSearchList);
+                doLyricsFragmentTransaction(tx, lyricSearchList);
+                tx.commit();
 
+                if((numberSearchList != null && numberSearchList.size() == 0)
+                        &&(titleSearchList != null && titleSearchList.size() == 0)
+                        &&(lyricSearchList != null && lyricSearchList.size() == 0)
+                        && !argument.isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Sem rsultados para '" + argument +"'", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -127,28 +108,34 @@ public class SearchSongActivity extends AppCompatActivity {
         });
     }
 
-    private void doNumberFragmentTransaction(FragmentManager manager, SearchResultFragment listFragment) {
-        FragmentTransaction tx = manager.beginTransaction();
+    private void doNumberFragmentTransaction(FragmentTransaction tx, List<Cantico> numberSearchList) {
+        Bundle numberParams = new Bundle();
+        numberParams.putSerializable("numberList", (ArrayList<Cantico>)numberSearchList);
 
-        tx.replace(R.id.number_list_song_frame, listFragment);
-        //tx.addToBackStack(null);
-        tx.commit();
+        SearchResultFragment numberListFragment = new SearchResultFragment();
+        numberListFragment.setArguments(numberParams);
+
+        tx.replace(R.id.number_list_song_frame, numberListFragment);
     }
 
-    private void doTitleFragmentTransaction(FragmentManager manager, SearchResultTitleFragment listFragment) {
-        FragmentTransaction tx = manager.beginTransaction();
+    private void doTitleFragmentTransaction(FragmentTransaction tx, List<Cantico> titleSearchList) {
+        Bundle titleParams = new Bundle();
+        titleParams.putSerializable("titleList", (ArrayList<Cantico>)titleSearchList);
 
-        tx.replace(R.id.title_list_song_frame, listFragment);
-        //tx.addToBackStack(null);
-        tx.commit();
+        SearchResultTitleFragment titleListFragment = new SearchResultTitleFragment();
+        titleListFragment.setArguments(titleParams);
+
+        tx.replace(R.id.title_list_song_frame, titleListFragment);
     }
 
-    private void doLyricsFragmentTransaction(FragmentManager manager, SearchResultLyricsFragment listFragment) {
-        FragmentTransaction tx = manager.beginTransaction();
+    private void doLyricsFragmentTransaction(FragmentTransaction tx, List<Cantico> lyricSearchList) {
+        Bundle lyricsParams = new Bundle();
+        lyricsParams.putSerializable("lyrcList", (ArrayList<Cantico>)lyricSearchList);
 
-        tx.replace(R.id.lyrics_list_song_frame, listFragment);
-        //tx.addToBackStack(null);
-        tx.commit();
+        SearchResultLyricsFragment lyricsListFragment = new SearchResultLyricsFragment();
+        lyricsListFragment.setArguments(lyricsParams);
+
+        tx.replace(R.id.lyrics_list_song_frame, lyricsListFragment);
     }
 
     @Override

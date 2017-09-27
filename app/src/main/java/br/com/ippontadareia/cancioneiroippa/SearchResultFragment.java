@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -24,12 +26,14 @@ public class SearchResultFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View viewNumberList = inflater.inflate(R.layout.fragment_search_result, container, false);
+        TextView titleText = viewNumberList.findViewById(R.id.title_list_number);
 
         Bundle params = getArguments();
         List<Cantico> resultList = (List<Cantico>) params.getSerializable("numberList");
         if(resultList != null && resultList.size() > 0){
+            titleText.setVisibility(View.VISIBLE);
+            titleText.setText(R.string.list_number_text);
             SongsAdapter adapter = new SongsAdapter(resultList, getContext());
             songList = (ListView) viewNumberList.findViewById(R.id.searched_number_list);
             //searched_list
@@ -45,6 +49,8 @@ public class SearchResultFragment extends Fragment {
                     startActivity(intentGoToLyrics);
                 }
             });
+        } else {
+            titleText.setVisibility(View.INVISIBLE);
         }
 
         return viewNumberList;

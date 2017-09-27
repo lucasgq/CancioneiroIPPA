@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -26,16 +28,17 @@ public class SearchResultLyricsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View viewLyricsList = inflater.inflate(R.layout.fragment_search_lyrics_result, container, false);
+        TextView titleText = viewLyricsList.findViewById(R.id.title_list_lyrics);
 
         Bundle params = getArguments();
         List<Cantico> resultList = (List<Cantico>) params.getSerializable("lyrcList");
 
         if(resultList != null && resultList.size() > 0){
+            titleText.setVisibility(View.VISIBLE);
+            titleText.setText(R.string.list_lyrics_text);
             SongsAdapter adapter = new SongsAdapter(resultList, getContext());
             lyricsSongList = (ListView) viewLyricsList.findViewById(R.id.searched_lyrics_list);
-            //searched_list
 
             lyricsSongList.setAdapter(adapter);
 
@@ -50,6 +53,8 @@ public class SearchResultLyricsFragment extends Fragment {
                 }
             });
 
+        }else {
+            titleText.setVisibility(View.INVISIBLE);
         }
 
         return viewLyricsList;
