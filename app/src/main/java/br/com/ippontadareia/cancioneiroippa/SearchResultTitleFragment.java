@@ -28,17 +28,22 @@ public class SearchResultTitleFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View viewTitleList = inflater.inflate(R.layout.fragment_search_title_result, container, false);
-        TextView titleText = viewTitleList.findViewById(R.id.title_list_title);
+        View viewList = inflater.inflate(R.layout.fragment_search_title_result, container, false);
+        //TextView titleText = viewList.findViewById(R.id.title_list_title);
 
         Bundle params = getArguments();
-        List<Cantico> resultList = (List<Cantico>) params.getSerializable("titleList");
+        List<Cantico> resultTitleList = (List<Cantico>) params.getSerializable("titleList");
+        List<Cantico> resultNumberList = (List<Cantico>) params.getSerializable("numberList");
 
-        if(resultList != null && resultList.size() > 0){
-            titleText.setVisibility(View.VISIBLE);
-            titleText.setText(R.string.list_title_text);
-            SongsAdapter adapter = new SongsAdapter(resultList, getContext());
-            titleSongList = (ListView) viewTitleList.findViewById(R.id.searched_title_list);
+        if(resultTitleList != null && resultTitleList.size() > 0){
+            //titleText.setVisibility(View.VISIBLE);
+
+            SongsAdapter adapter = new SongsAdapter(resultTitleList, getContext());
+            if(resultNumberList.size() > 0){
+                titleSongList = (ListView) viewList.findViewById(R.id.searched_title_list);
+            } else {
+                titleSongList = (ListView) viewList.findViewById(R.id.searched_number_list);
+            }
 
             titleSongList.setAdapter(adapter);
 
@@ -52,10 +57,11 @@ public class SearchResultTitleFragment extends Fragment {
                     startActivity(intentGoToLyrics);
                 }
             });
-        } else {
-            titleText.setVisibility(View.INVISIBLE);
         }
+//        else {
+//            titleText.setVisibility(View.INVISIBLE);
+//        }
 
-        return viewTitleList;
+        return viewList;
     }
 }

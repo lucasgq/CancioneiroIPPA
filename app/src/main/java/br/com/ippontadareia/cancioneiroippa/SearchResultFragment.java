@@ -21,22 +21,22 @@ public class SearchResultFragment extends Fragment {
 
     private ListView songList;
     private ListView titleSongList;
-    private ListView lyricSongList;
+    private ListView lyricsSongList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View viewNumberList = inflater.inflate(R.layout.fragment_search_result, container, false);
-        TextView titleText = viewNumberList.findViewById(R.id.title_list_number);
+        View viewList = inflater.inflate(R.layout.fragment_search_result, container, false);
+        //TextView titleText = viewList.findViewById(R.id.title_list_number);
 
         Bundle params = getArguments();
-        List<Cantico> resultList = (List<Cantico>) params.getSerializable("numberList");
-        if(resultList != null && resultList.size() > 0){
-            titleText.setVisibility(View.VISIBLE);
-            titleText.setText(R.string.list_number_text);
-            SongsAdapter adapter = new SongsAdapter(resultList, getContext());
-            songList = (ListView) viewNumberList.findViewById(R.id.searched_number_list);
-            //searched_list
+        List<Cantico> resultNumberList = (List<Cantico>) params.getSerializable("numberList");
+
+        if(resultNumberList != null && resultNumberList.size() > 0){
+//            titleText.setVisibility(View.VISIBLE);
+//            titleText.setText(R.string.list_number_text);
+            SongsAdapter adapter = new SongsAdapter(resultNumberList, getContext());
+            songList = (ListView) viewList.findViewById(R.id.searched_number_list);
             songList.setAdapter(adapter);
 
             songList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -49,11 +49,11 @@ public class SearchResultFragment extends Fragment {
                     startActivity(intentGoToLyrics);
                 }
             });
-        } else {
-            titleText.setVisibility(View.INVISIBLE);
         }
-
-        return viewNumberList;
+//        else {
+//            titleText.setVisibility(View.INVISIBLE);
+//        }
+        return viewList;
     }
 
 }

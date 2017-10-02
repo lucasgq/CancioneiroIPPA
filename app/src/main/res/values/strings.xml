@@ -3,7 +3,6 @@
     <string name="title_activity_lyrics">LyricsActivity</string>
     <string name="title_activity_create_song">CreateSong</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_settings">Settings</string>
 

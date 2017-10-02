@@ -28,17 +28,25 @@ public class SearchResultLyricsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View viewLyricsList = inflater.inflate(R.layout.fragment_search_lyrics_result, container, false);
-        TextView titleText = viewLyricsList.findViewById(R.id.title_list_lyrics);
+        View viewList = inflater.inflate(R.layout.fragment_search_lyrics_result, container, false);
+        //TextView titleText = viewList.findViewById(R.id.title_list_lyrics);
 
         Bundle params = getArguments();
-        List<Cantico> resultList = (List<Cantico>) params.getSerializable("lyrcList");
+        List<Cantico> resultLyricsList = (List<Cantico>) params.getSerializable("lyrcList");
+        List<Cantico> resultTitleList = (List<Cantico>) params.getSerializable("titleList");
+        List<Cantico> resultNumberList = (List<Cantico>) params.getSerializable("numberList");
 
-        if(resultList != null && resultList.size() > 0){
-            titleText.setVisibility(View.VISIBLE);
-            titleText.setText(R.string.list_lyrics_text);
-            SongsAdapter adapter = new SongsAdapter(resultList, getContext());
-            lyricsSongList = (ListView) viewLyricsList.findViewById(R.id.searched_lyrics_list);
+        if(resultLyricsList != null && resultLyricsList.size() > 0){
+//            titleText.setVisibility(View.VISIBLE);
+//            titleText.setText(R.string.list_lyrics_text);
+            SongsAdapter adapter = new SongsAdapter(resultLyricsList, getContext());
+            if(resultTitleList.size() > 0 && resultNumberList.size() > 0){
+                lyricsSongList = (ListView) viewList.findViewById(R.id.searched_lyrics_list);
+            } else if(resultNumberList.size() > 0 || resultTitleList.size() > 0){
+                lyricsSongList = (ListView) viewList.findViewById(R.id.searched_title_list);
+            } else if (resultTitleList.size() < 0 && resultNumberList.size() < 0){
+                lyricsSongList = (ListView) viewList.findViewById(R.id.searched_number_list);
+            }
 
             lyricsSongList.setAdapter(adapter);
 
@@ -53,10 +61,11 @@ public class SearchResultLyricsFragment extends Fragment {
                 }
             });
 
-        }else {
-            titleText.setVisibility(View.INVISIBLE);
         }
+//        else {
+//            titleText.setVisibility(View.INVISIBLE);
+//        }
 
-        return viewLyricsList;
+        return viewList;
     }
 }

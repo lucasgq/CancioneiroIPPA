@@ -28,8 +28,22 @@
             android:textColor="@color/colorDarkerGrey"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <FrameLayout
+        <ExpandableListView
+            android:id="@+id/expandable_complete_list"
+            android:groupIndicator="@null"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ExpandableListView>
+
+
+    </LinearLayout>
+
+    <!--FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/allWhite"
@@ -55,6 +69,6 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/space_dimension" />
+        android:layout_height="@dimen/space_dimension" /-->
 
 </LinearLayout>
