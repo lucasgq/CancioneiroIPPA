@@ -1,9 +1,6 @@
 package br.com.ippontadareia.cancioneiroippa;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,12 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -28,14 +20,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import br.com.ippontadareia.cancioneiroippa.adapter.SongsAdapter;
+import br.com.ippontadareia.cancioneiroippa.adapter.ExpandableListAdapter;
 import br.com.ippontadareia.cancioneiroippa.dao.CanticoDAO;
 import br.com.ippontadareia.cancioneiroippa.dao.TamanhoFonteDAO;
 import br.com.ippontadareia.cancioneiroippa.helper.Constants;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
 import br.com.ippontadareia.cancioneiroippa.modelo.TamanhoFonte;
-
-import static java.security.AccessController.getContext;
 
 public class SearchSongActivity extends AppCompatActivity {
 
@@ -97,12 +87,6 @@ public class SearchSongActivity extends AppCompatActivity {
                 cantico.setLyrics(argument);
                 lyricSearchList = dao.selectByLyrics(cantico.getLyrics());
 
-                Bundle params = new Bundle();
-
-                params.putSerializable("numberList", (ArrayList<Cantico>)numberSearchList);
-                params.putSerializable("titleList", (ArrayList<Cantico>)titleSearchList);
-                params.putSerializable("lyrcList", (ArrayList<Cantico>)lyricSearchList);
-
                 expListView = (ExpandableListView) findViewById(R.id.expandable_complete_list);
 
                 prepareResultList(numberSearchList, titleSearchList, lyricSearchList);
@@ -111,28 +95,22 @@ public class SearchSongActivity extends AppCompatActivity {
 
                 expListView.setAdapter(listAdapter);
 
+                expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                    @Override
+                    public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long id) {
+                        Cantico cantico = (Cantico) listAdapter.getChild(groupPosition, childPosition);
+
+                        Intent intentGoToLyrics = new Intent(getBaseContext(), LyricsActivity.class);
+                        intentGoToLyrics.putExtra("cantico", cantico);
+                        startActivity(intentGoToLyrics);
+
+                        return true;
+                    }
+                });
+
                 for(int i = 0; i < listHeader.size(); i++){
                     expListView.expandGroup(i);
                 }
-//                SearchResultFragment fragment = new SearchResultFragment();
-//                SearchResultTitleFragment titleListFragment = new SearchResultTitleFragment();
-//                SearchResultLyricsFragment lyricsListFragment = new SearchResultLyricsFragment();
-//
-//                fragment.setArguments(params);
-////                titleListFragment.setArguments(titleParams);
-////                lyricsListFragment.setArguments(lyricsParams);
-//
-//                FragmentTransaction tx = manager.beginTransaction();
-//
-//                tx.replace(R.id.number_list_song_frame, fragment);
-//                tx.replace(R.id.title_list_song_frame, titleListFragment);
-//                tx.replace(R.id.lyrics_list_song_frame, lyricsListFragment);
-
-                //      CALLING INDIVIDUAL FRAGMENTS
-                //doNumberFragmentTransaction(tx, numberSearchList);
-                //doTitleFragmentTransaction(tx, titleSearchList);
-                //doLyricsFragmentTransaction(tx, lyricSearchList);
-//                tx.commit();
 
                 if((numberSearchList != null && numberSearchList.size() == 0)
                         &&(titleSearchList != null && titleSearchList.size() == 0)
@@ -168,37 +146,6 @@ public class SearchSongActivity extends AppCompatActivity {
         }
 
     }
-
-    /*
-    private void doNumberFragmentTransaction(FragmentTransaction tx, List<Cantico> numberSearchList) {
-        Bundle numberParams = new Bundle();
-        numberParams.putSerializable("numberList", (ArrayList<Cantico>)numberSearchList);
-
-        SearchResultFragment numberListFragment = new SearchResultFragment();
-        numberListFragment.setArguments(numberParams);
-
-        tx.replace(R.id.number_list_song_frame, numberListFragment);
-    }
-
-    private void doTitleFragmentTransaction(FragmentTransaction tx, List<Cantico> titleSearchList) {
-        Bundle titleParams = new Bundle();
-        titleParams.putSerializable("titleList", (ArrayList<Cantico>)titleSearchList);
-
-        SearchResultTitleFragment titleListFragment = new SearchResultTitleFragment();
-        titleListFragment.setArguments(titleParams);
-
-        tx.replace(R.id.title_list_song_frame, titleListFragment);
-    }
-
-    private void doLyricsFragmentTransaction(FragmentTransaction tx, List<Cantico> lyricSearchList) {
-        Bundle lyricsParams = new Bundle();
-        lyricsParams.putSerializable("lyrcList", (ArrayList<Cantico>)lyricSearchList);
-
-        SearchResultLyricsFragment lyricsListFragment = new SearchResultLyricsFragment();
-        lyricsListFragment.setArguments(lyricsParams);
-
-        tx.replace(R.id.lyrics_list_song_frame, lyricsListFragment);
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

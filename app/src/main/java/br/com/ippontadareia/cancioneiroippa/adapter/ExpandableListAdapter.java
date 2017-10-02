@@ -1,4 +1,4 @@
-package br.com.ippontadareia.cancioneiroippa;
+package br.com.ippontadareia.cancioneiroippa.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 
+import br.com.ippontadareia.cancioneiroippa.R;
 import br.com.ippontadareia.cancioneiroippa.dao.TamanhoFonteDAO;
 import br.com.ippontadareia.cancioneiroippa.helper.Constants;
 import br.com.ippontadareia.cancioneiroippa.modelo.Cantico;
@@ -80,10 +81,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         TextView labelListHeader = convertView.findViewById(R.id.list_group_label);
         labelListHeader.setTypeface(null, Typeface.ITALIC);
-        //TODO SET TEXTSIZE
+
         TamanhoFonteDAO fontDAO = new TamanhoFonteDAO(context);
         TamanhoFonte sizes = fontDAO.selectSizes();
-        labelListHeader.setTextSize(sizes.getLyricSize());
+        labelListHeader.setTextSize(sizes.getLyricSize() - 2);
         labelListHeader.setText(headerTitle);
 
         return convertView;
@@ -98,7 +99,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         View view = convertView;
         if(view == null){
-            //TODO DELETAR ARQUIVO search_list_item???
             view = inflater.inflate(R.layout.list_item, parent, false);
         }
 
