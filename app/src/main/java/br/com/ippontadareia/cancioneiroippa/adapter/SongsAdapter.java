@@ -58,9 +58,10 @@ public class SongsAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView titleField = (TextView) view.findViewById(R.id.item_title);
-        TextView firstLineField = (TextView) view.findViewById(R.id.item_first_line);
-        ImageView favoriteField = (ImageView) view.findViewById(R.id.item_favorite);
+        TextView titleField = view.findViewById(R.id.item_title);
+        TextView searchedLineField = view.findViewById(R.id.item_search_line);
+        TextView firstLineField = view.findViewById(R.id.item_first_line);
+        ImageView favoriteField = view.findViewById(R.id.item_favorite);
 
         TamanhoFonteDAO fontDAO = new TamanhoFonteDAO(context);
         TamanhoFonte sizes = fontDAO.selectSizes();
@@ -82,6 +83,8 @@ public class SongsAdapter extends BaseAdapter {
             }
             firstLineField.setText(firstLine);
             firstLineField.setTextSize(sizes.getListLyricSize());
+        } else if(firstLineField == null){
+            searchedLineField.setVisibility(View.GONE);
         }
         if(favoriteField != null){
             if(cantico.isFavorite()){

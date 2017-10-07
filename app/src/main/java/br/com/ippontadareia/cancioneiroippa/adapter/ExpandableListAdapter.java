@@ -1,14 +1,24 @@
 package br.com.ippontadareia.cancioneiroippa.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,11 +37,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> listHeaders;
     private HashMap<String, List<Cantico>> resultList;
+    private String argument;
 
-    public ExpandableListAdapter(Context context, List<String> listHeaders, HashMap<String, List<Cantico>> resultList) {
+    public ExpandableListAdapter(Context context, List<String> listHeaders, HashMap<String, List<Cantico>> resultList, String argument) {
         this.context = context;
         this.listHeaders = listHeaders;
         this.resultList = resultList;
+        this.argument = argument;
     }
 
     @Override
@@ -72,8 +84,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
-        //Seleciona os headers de cada uma das listas
-        String headerTitle = (String)listHeaders.get(groupPosition);
+        String headerTitle = listHeaders.get(groupPosition);
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_group, null);
@@ -102,31 +113,50 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             view = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView titleField = (TextView) view.findViewById(R.id.item_title);
-        TextView firstLineField = (TextView) view.findViewById(R.id.item_first_line);
-        ImageView favoriteField = (ImageView) view.findViewById(R.id.item_favorite);
+        LinearLayout layout = view.findViewById(R.id.song_list_layout);
+        TextView titleField = view.findViewById(R.id.item_title);
+        TextView firstLineField = view.findViewById(R.id.item_first_line);
+        TextView searchedLineField = view.findViewById(R.id.item_search_line);
+        ImageView favoriteField = view.findViewById(R.id.item_favorite);
 
         TamanhoFonteDAO fontDAO = new TamanhoFonteDAO(context);
         TamanhoFonte sizes = fontDAO.selectSizes();
 
         titleField.setText(cantico.getNumber() + " - " + cantico.getTitle());
+        System.out.printf("\n\n" + cantico.getNumber() + " - " + cantico.getTitle() + "\n");
         titleField.setTextSize(sizes.getListTitleSize());
 
+        String[] lyric = cantico.getLyrics().split("\n");
+
+        String searchedLine = "";
+
+        if(searchedLineField != null){
+            if(groupPosition == listHeaders.size() - 1){
+                searchedLine = fitLyricsLine(lyric, searchedLine);
+                searchedLineField.setText(Html.fromHtml(searchedLine));
+                searchedLineField.setTextSize(sizes.getListLyricSize());
+            } else{
+                searchedLineField.setVisibility(View.GONE);
+            }
+        }
+
         if(firstLineField != null){
-            String[] lyric = cantico.getLyrics().split("\n");
             String firstLine = lyric[0];
 
             if(Constants.CHORUS.equals(firstLine)){
                 firstLine = lyric[1];
             }
 
-            if(firstLine.length() > Constants.LYRICSMAXLENGHT){
-                firstLine = String.valueOf(firstLine.subSequence(0, Constants.LYRICSMAXLENGHT));
-                firstLine = firstLine + "...";
+            if(groupPosition == listHeaders.size() - 1){
+                searchedLine = fitLyricsLine(lyric, searchedLine);
+                firstLineField.setText(Html.fromHtml(searchedLine));
+            } else {
+                //firstLine = fitLyricsLength(firstLine);
+                firstLineField.setText(firstLine);
             }
-            firstLineField.setText(firstLine);
             firstLineField.setTextSize(sizes.getListLyricSize());
         }
+
         if(favoriteField != null){
             if(cantico.isFavorite()){
                 favoriteField.setImageResource(R.drawable.shorter_favorite_on);
@@ -136,6 +166,41 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         return view;
+    }
+
+    private String fitLyricsLine(String[] lyric, String lyricsLine) {
+        for (String aLyric : lyric) {
+            if (aLyric.toLowerCase().contains(argument.toLowerCase())) {
+                String line = aLyric;
+                //line = fitLyricsLength(line);
+                if (lyricsLine.isEmpty()) {
+                    line = enlightenArgument(line);
+                    lyricsLine = line;
+                } else {
+                    line = enlightenArgument(line);
+                    lyricsLine = lyricsLine + "<br>" + line;
+                }
+            }
+        }
+        return lyricsLine;
+    }
+
+    @NonNull
+    private String enlightenArgument(String line) {
+        int initialPosition = line.toLowerCase().indexOf(argument.toLowerCase());
+        int finalPosition = initialPosition + argument.length();
+
+        line = line.substring(0, initialPosition ) + "<font color=#3C01FC>" + line.substring(initialPosition, finalPosition) + "</font>" + line.substring(finalPosition, line.length());
+        return line;
+    }
+
+    @NonNull
+    private String fitLyricsLength(String line) {
+        if(line.length() > Constants.LYRICSMAXLENGHT){
+            line = String.valueOf(line.subSequence(0, Constants.LYRICSMAXLENGHT));
+            line = line + "...";
+        }
+        return line;
     }
 
     @Override

@@ -67,11 +67,13 @@ public class SearchSongActivity extends AppCompatActivity {
                 //FragmentManager manager = getSupportFragmentManager();
 
                 String argument = searchArgument.getText().toString().trim();
+                Bundle params = new Bundle();
+                params.putSerializable("argument", argument);
 
                 Cantico cantico = new Cantico();
-                List<Cantico> numberSearchList = new ArrayList<Cantico>();
-                List<Cantico> titleSearchList = new ArrayList<Cantico>();
-                List<Cantico> lyricSearchList = new ArrayList<Cantico>();
+                List<Cantico> numberSearchList = new ArrayList<>();
+                List<Cantico> titleSearchList = new ArrayList<>();
+                List<Cantico> lyricSearchList = new ArrayList<>();
 
                 CanticoDAO dao = new CanticoDAO(SearchSongActivity.this);
                 String argumentToNumber = searchArgument.getText().toString().trim();
@@ -91,7 +93,7 @@ public class SearchSongActivity extends AppCompatActivity {
 
                 prepareResultList(numberSearchList, titleSearchList, lyricSearchList);
 
-                listAdapter = new ExpandableListAdapter(getBaseContext(), listHeader, resultListChild);
+                listAdapter = new ExpandableListAdapter(getBaseContext(), listHeader, resultListChild, argument);
 
                 expListView.setAdapter(listAdapter);
 
@@ -116,7 +118,7 @@ public class SearchSongActivity extends AppCompatActivity {
                         &&(titleSearchList != null && titleSearchList.size() == 0)
                         &&(lyricSearchList != null && lyricSearchList.size() == 0)
                         && !argument.isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Sem rsultados para '" + argument +"'", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Sem resultados para '" + argument +"'", Toast.LENGTH_SHORT).show();
                 }
             }
 
