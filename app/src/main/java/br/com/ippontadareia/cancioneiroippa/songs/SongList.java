@@ -31,8 +31,9 @@ public class SongList {
                 "Salmo 139", "Salmo 37", "Salmo 103", "Salmo 122", "Salmo 46", "Me achego a Ti", "Salmo 24", "Salmo 85", "Minh’alma canta ao Senhor", "Salmo 16",
                 "Deus, Tu és meu Deus", "Salmo 142", "Salmo 146", "Salmo 121", "Salmo 145", "Salmo 18", "Salmo 8", "Salmo 3 (Amazing Grace)", "Salmo 11", "Fale Ó Deus");
 
+
         listLyrics = Arrays.asList("Tua, Senhor, é a grandeza e o poder\n" +
-                "A honra, a vitória e a majestade\n" +
+                        "A honra, a vitória e a majestade\n" +
                         "Porque Teu é tudo quanto há nos céus e na terra\n" +
                         "Teu, Senhor, é o reino, e Tu te exaltaste\n" +
                         "Por chefe sobre todos\n" +
@@ -1457,7 +1458,6 @@ public class SongList {
                         "Pela fé e graça em Cristo Jesus\n" +
                         "Fale, Ó Deus, vem edificar\n" +
                         "Tua igreja pra tua glória");
-
         List<Cantico> listaCompleta = new ArrayList<Cantico>();
 
         int numberOfTitles = listTitles.size();

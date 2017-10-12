@@ -35,40 +35,12 @@
 
         <ExpandableListView
             android:id="@+id/expandable_complete_list"
-            android:groupIndicator="@null"
+            android:groupIndicator="@color/allWhite"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </ExpandableListView>
 
 
     </LinearLayout>
-
-    <!--FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/allWhite"
-        android:id="@+id/number_list_song_frame">
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/allWhite"
-        android:id="@+id/title_list_song_frame">
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/allWhite"
-        android:id="@+id/lyrics_list_song_frame">
-
-    </FrameLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/space_dimension" /-->
 
 </LinearLayout>

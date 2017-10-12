@@ -110,9 +110,10 @@ public class SearchSongActivity extends AppCompatActivity {
                     }
                 });
 
-                for(int i = 0; i < listHeader.size(); i++){
-                    expListView.expandGroup(i);
-                }
+                //TODO FIND OUT A WAY TO EXPAND ALL GROUPS AND NOT CRASH THE PRESENTATION
+//                for(int i = 0; i < listHeader.size(); i++){
+//                    expListView.expandGroup(i);
+//                }
 
                 if((numberSearchList != null && numberSearchList.size() == 0)
                         &&(titleSearchList != null && titleSearchList.size() == 0)
